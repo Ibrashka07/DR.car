@@ -51,7 +51,14 @@
 
 ## ⚙️ Структура проекта
 
-![](./docs/image/struct.png)
+### 👾 Backend 
+![Бэкэнд](./docs/image/backend.png)
+
+### ✔️ Frontend
+![Фронтенд](./docs/image/frontend.png)
+
+### 📁 Документация
+![Документация](./docs/image/docs.png)
 
 ## 👨🏻‍🎓 Автор 
 [Перейти на GitHub](https://github.com/Ibrashka07)
