@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useCart } from '../contexts/CartContext';
+import { mediaUrl } from '../utils/media';
 
 export default function CatalogPage() {
   const [categories, setCategories] = useState([]);
@@ -34,16 +35,19 @@ export default function CatalogPage() {
     );
   }
 
-  async function handleAddToCart(productId) {
-    await addToCart(productId);
-    setAdded(prev => ({ ...prev, [productId]: true }));
-    setTimeout(() => setAdded(prev => ({ ...prev, [productId]: false })), 1500);
+  function handleAddToCart(product) {
+    addToCart(product);
+    setAdded(prev => ({ ...prev, [product.id]: true }));
+    setTimeout(() => setAdded(prev => ({ ...prev, [product.id]: false })), 1500);
   }
 
   return (
-    <div style={{ paddingTop: '64px', minHeight: '100vh' }}>
+    <div style={{ paddingTop: '64px', minHeight: '100vh', background: '#0a0a0a' }}>
       <div style={{ maxWidth: 1300, margin: '0 auto', padding: '3rem 2rem' }}>
-        <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+        <h1 style={{
+          fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: 700,
+          textTransform: 'uppercase', marginBottom: '0.5rem',
+        }}>
           Каталог товаров
         </h1>
         <p style={{ color: 'rgba(255,255,255,0.4)', marginBottom: '3rem' }}>
@@ -51,13 +55,19 @@ export default function CatalogPage() {
         </p>
 
         <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'flex-start' }}>
+
           {/* ── Фильтры ── */}
           <aside style={{
             width: 220, flexShrink: 0,
             background: '#111', border: '1px solid rgba(255,255,255,0.07)',
-            borderRadius: '12px', padding: '1.5rem', position: 'sticky', top: 80,
+            borderRadius: '12px', padding: '1.5rem',
+            position: 'sticky', top: 80,
           }}>
-            <p style={{ fontWeight: 600, fontSize: '0.85rem', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '1.25rem', color: 'rgba(255,255,255,0.6)' }}>
+            <p style={{
+              fontWeight: 600, fontSize: '0.85rem', letterSpacing: '1px',
+              textTransform: 'uppercase', marginBottom: '1.25rem',
+              color: 'rgba(255,255,255,0.6)',
+            }}>
               Категории
             </p>
             {categories.map(cat => (
@@ -66,9 +76,12 @@ export default function CatalogPage() {
                 marginBottom: '0.75rem', cursor: 'pointer', fontSize: '0.9rem',
                 color: selected.includes(cat.id) ? 'white' : 'rgba(255,255,255,0.55)',
               }}>
-                <input type="checkbox" checked={selected.includes(cat.id)}
+                <input
+                  type="checkbox"
+                  checked={selected.includes(cat.id)}
                   onChange={() => toggleCategory(cat.id)}
-                  style={{ accentColor: 'white', width: 14, height: 14 }} />
+                  style={{ accentColor: 'white', width: 14, height: 14 }}
+                />
                 {cat.title}
               </label>
             ))}
@@ -84,24 +97,34 @@ export default function CatalogPage() {
 
           {/* ── Товары ── */}
           <div style={{ flex: 1 }}>
-            <input value={search} onChange={e => setSearch(e.target.value)}
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               placeholder="Поиск по названию, бренду..."
               style={{
                 width: '100%', padding: '0.75rem 1rem', marginBottom: '1.5rem',
                 background: '#111', border: '1px solid rgba(255,255,255,0.08)',
                 borderRadius: '8px', color: 'white', fontSize: '0.95rem',
-              }} />
+              }}
+            />
 
             {loading ? (
               <p style={{ color: 'rgba(255,255,255,0.3)' }}>Загрузка...</p>
             ) : products.length === 0 ? (
               <p style={{ color: 'rgba(255,255,255,0.3)' }}>Товары не найдены</p>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '1.25rem',
+              }}>
                 {products.map(p => (
-                  <ProductCard key={p.id} product={p}
-                    onAddToCart={() => handleAddToCart(p.id)}
-                    justAdded={!!added[p.id]} />
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    onAddToCart={() => handleAddToCart(p)}
+                    justAdded={!!added[p.id]}
+                  />
                 ))}
               </div>
             )}
@@ -113,21 +136,38 @@ export default function CatalogPage() {
 }
 
 function ProductCard({ product: p, onAddToCart, justAdded }) {
-  const BADGE_COLORS = { hit: '#f59e0b', new: '#10b981', sale: '#ef4444' };
-  const BADGE_LABELS = { hit: 'Хит', new: 'Новинка', sale: 'Акция' };
+  const BADGE_COLORS  = { hit: '#f59e0b', new: '#10b981', sale: '#ef4444' };
+  const BADGE_LABELS  = { hit: 'Хит',     new: 'Новинка', sale: 'Акция'  };
 
   return (
     <div style={{
       background: '#111', border: '1px solid rgba(255,255,255,0.07)',
       borderRadius: '12px', overflow: 'hidden',
       display: 'flex', flexDirection: 'column',
-    }}>
+      transition: 'border-color 0.2s, transform 0.2s',
+    }}
+      onMouseEnter={e => {
+        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)';
+        e.currentTarget.style.transform = 'translateY(-3px)';
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }}
+    >
       {/* Фото */}
       <div style={{ position: 'relative', height: 200, background: '#1a1a1a' }}>
         {p.photo
-          ? <img src={`http://127.0.0.1:8000${p.photo}`} alt={p.title}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>🔧</div>
+          ? <img
+              src={mediaUrl(p.photo)}
+              alt={p.title}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          : <div style={{
+              width: '100%', height: '100%',
+              display: 'flex', alignItems: 'center',
+              justifyContent: 'center', fontSize: '3rem',
+            }}>🔧</div>
         }
         {p.badge && (
           <span style={{
@@ -144,7 +184,10 @@ function ProductCard({ product: p, onAddToCart, justAdded }) {
       {/* Контент */}
       <div style={{ padding: '1.1rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {p.brand && (
-          <p style={{ fontSize: '0.72rem', letterSpacing: '1px', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginBottom: '0.3rem' }}>
+          <p style={{
+            fontSize: '0.72rem', letterSpacing: '1px',
+            color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginBottom: '0.3rem',
+          }}>
             {p.brand}
           </p>
         )}
@@ -158,21 +201,29 @@ function ProductCard({ product: p, onAddToCart, justAdded }) {
             {Number(p.price).toLocaleString('ru-RU')} ₽
           </span>
           {p.old_price && (
-            <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.3)', textDecoration: 'line-through' }}>
+            <span style={{
+              fontSize: '0.85rem',
+              color: 'rgba(255,255,255,0.3)',
+              textDecoration: 'line-through',
+            }}>
               {Number(p.old_price).toLocaleString('ru-RU')} ₽
             </span>
           )}
         </div>
 
-        <button onClick={onAddToCart} style={{
-          width: '100%', padding: '0.65rem',
-          background: justAdded ? '#1a1a1a' : 'white',
-          color: justAdded ? 'rgba(255,255,255,0.6)' : '#000',
-          border: justAdded ? '1px solid rgba(255,255,255,0.1)' : 'none',
-          borderRadius: '7px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer',
-          transition: 'all 0.2s',
-        }}>
-          {justAdded ? '✓ Добавлено' : 'В корзину'}
+        {/* Кнопка */}
+        <button
+          onClick={onAddToCart}
+          style={{
+            width: '100%', padding: '0.65rem',
+            background: justAdded ? '#1a1a1a' : 'white',
+            color: justAdded ? 'rgba(255,255,255,0.6)' : '#000',
+            border: justAdded ? '1px solid rgba(255,255,255,0.1)' : 'none',
+            borderRadius: '7px', fontWeight: 600, fontSize: '0.85rem',
+            cursor: 'pointer', transition: 'all 0.2s',
+          }}
+        >
+          {justAdded ? '✓ В корзине' : 'В корзину'}
         </button>
       </div>
     </div>

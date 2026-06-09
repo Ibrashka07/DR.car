@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { mediaUrl } from '../utils/media';
 
 export default function ServiceCard({ service }) {
   return (
@@ -23,7 +24,7 @@ export default function ServiceCard({ service }) {
         overflow: 'hidden',
       }}>
         {service.photo ? (
-          <img src={`http://127.0.0.1:8000${service.photo}`}
+          <img src={mediaUrl(service.photo)}
             alt={service.title}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (

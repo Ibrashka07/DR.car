@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Slider from '../components/Slider';
 import api from '../services/api';
+import { mediaUrl } from '../utils/media';
 
 export default function HomePage() {
   const [reviews, setReviews] = useState([]);
@@ -192,7 +193,7 @@ export default function HomePage() {
                       overflow: 'hidden', flexShrink: 0,
                     }}>
                       {r.author_avatar
-                        ? <img src={r.author_avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ? <img src={mediaUrl(r.author_avatar)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>👤</div>
                       }
                     </div>
@@ -207,7 +208,7 @@ export default function HomePage() {
                   </div>
                   <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.9rem', lineHeight: 1.7 }}>{r.text}</p>
                   {r.photo && (
-                    <img src={`http://127.0.0.1:8000${r.photo}`} alt=""
+                    <img src={mediaUrl(r.photo)} alt=""
                       style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: '8px', marginTop: '1rem' }} />
                   )}
                 </div>
