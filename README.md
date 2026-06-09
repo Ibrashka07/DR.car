@@ -51,6 +51,8 @@
 
 ## ⚙️ Структура проекта
 
+![](./docs/image/struct.png)
+
 ## 👨🏻‍🎓 Автор 
 [Перейти на GitHub](https://github.com/Ibrashka07)
 
